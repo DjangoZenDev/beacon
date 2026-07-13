@@ -1,0 +1,51 @@
+# Istio VirtualService — Region-Based Routing
+# Chapter 13: Multi-Region / Kubernetes
+# Routes traffic to the nearest region based on the X-Region header.
+# DNS-based latency routing directs users to the closest Istio Gateway;
+# this VirtualService ensures intra-mesh requests also respect locality.
+# Principle 18: "Global consistency costs latency."
+
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: beacon-vs
+  namespace: beacon-prod
+  labels:
+    app: beacon
+    chapter: "13"
+spec:
+  hosts:
+    - beacon.example.com
+    - beacon-django.beacon-prod.svc.cluster.local
+  gateways:
+    - beacon-gateway
+    - mesh
+  http:
+    - match:
+        - headers:
+            x-region:
+              exact: "us-east"
+      route:
+        - destination:
+            host: beacon-django.beacon-prod.svc.cluster.local
+            subset: us-east
+    - match:
+        - headers:
+            x-region:
+              exact: "eu-west"
+      route:
+        - destination:
+            host: beacon-django.beacon-prod.svc.cluster.local
+            subset: eu-west
+    - match:
+        - headers:
+            x-region:
+              exact: "ap-south"
+      route:
+        - destination:
+            host: beacon-django.beacon-prod.svc.cluster.local
+            subset: ap-south
+    - route:
+        - destination:
+            host: beacon-django.beacon-prod.svc.cluster.local
+          weight: 100

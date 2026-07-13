@@ -1,0 +1,66 @@
+{% extends "core/base.html" %}
+
+{% block title %}Beacon — All Pages{% endblock %}
+
+{% block content %}
+
+<form class="search-bar" method="get" action="{% url 'page_list' %}">
+    <input
+        type="search"
+        name="q"
+        placeholder="Search pages..."
+        value="{{ query }}"
+        autofocus
+    >
+    <button type="submit">Search</button>
+</form>
+
+{% if query %}
+    <p style="color:var(--color-muted);margin-bottom:1rem;">
+        Results for &ldquo;<strong>{{ query }}</strong>&rdquo;
+        &mdash; {{ pages.count }} page{{ pages.count|pluralize }} found.
+        <a href="{% url 'page_list' %}">Clear</a>
+    </p>
+{% endif %}
+
+{% if pages %}
+    {% for page in pages %}
+        <div class="page-card">
+            <h2>
+                <a href="{{ page.get_absolute_url }}">{{ page.title }}</a>
+            </h2>
+            <div class="meta">
+                by {{ page.author.username }} &middot;
+                {{ page.updated_at|date:"M j, Y" }} &middot;
+                {{ page.outgoing_count }} link{{ page.outgoing_count|pluralize }} &middot;
+                {{ page.incoming_count }} backlink{{ page.incoming_count|pluralize }}
+            </div>
+        </div>
+    {% endfor %}
+
+    {% if is_paginated %}
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?{% if query %}q={{ query }}&{% endif %}page={{ page_obj.previous_page_number }}">&laquo; Prev</a>
+            {% endif %}
+            <span class="current">Page {{ page_obj.number }} of {{ paginator.num_pages }}</span>
+            {% if page_obj.has_next %}
+                <a href="?{% if query %}q={{ query }}&{% endif %}page={{ page_obj.next_page_number }}">Next &raquo;</a>
+            {% endif %}
+        </div>
+    {% endif %}
+{% else %}
+    <div class="empty-state">
+        {% if query %}
+            <p>No pages match &ldquo;<strong>{{ query }}</strong>&rdquo;.</p>
+            <p>Try a different search term, or <a href="{% url 'page_edit' slug='new' %}">create a new page</a>.</p>
+        {% else %}
+            <p>Beacon is empty. Time to light the way.</p>
+            <p>
+                <a href="{% url 'page_edit' slug='new' %}" class="btn">Create the First Page</a>
+            </p>
+        {% endif %}
+    </div>
+{% endif %}
+
+{% endblock %}

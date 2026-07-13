@@ -1,0 +1,38 @@
+// Beacon v0.8 — Page Service gRPC Protocol Definition
+// Chapter 8: carried forward from Chapter 7. Async events via outbox.
+syntax = "proto3";
+package page.v1;
+option go_package = "github.com/beacon/page-service/proto/page/v1;pagev1";
+
+service PageService {
+    rpc GetPage(GetPageRequest) returns (GetPageResponse);
+    rpc ListPages(ListPagesRequest) returns (ListPagesResponse);
+    rpc CreatePage(CreatePageRequest) returns (CreatePageResponse);
+    rpc UpdatePage(UpdatePageRequest) returns (UpdatePageResponse);
+    rpc DeletePage(DeletePageRequest) returns (DeletePageResponse);
+    rpc SearchPages(SearchPagesRequest) returns (SearchPagesResponse);
+}
+
+message Page {
+    int64 id = 1; int32 organization_id = 2; string title = 3; string slug = 4;
+    string body = 5; int64 author_id = 6; int32 incoming_count = 7;
+    int32 outgoing_count = 8; string created_at = 9; string updated_at = 10;
+}
+
+message GetPageRequest { int32 organization_id = 1; string slug = 2; }
+message GetPageResponse { Page page = 1; }
+
+message ListPagesRequest { int32 organization_id = 1; int32 page_size = 2; string page_token = 3; string order_by = 4; }
+message ListPagesResponse { repeated Page pages = 1; string next_page_token = 2; int32 total_count = 3; }
+
+message CreatePageRequest { int32 organization_id = 1; string title = 2; string body = 3; int64 author_id = 4; }
+message CreatePageResponse { Page page = 1; }
+
+message UpdatePageRequest { int32 organization_id = 1; string slug = 2; string title = 3; string body = 4; }
+message UpdatePageResponse { Page page = 1; }
+
+message DeletePageRequest { int32 organization_id = 1; string slug = 2; }
+message DeletePageResponse { bool success = 1; }
+
+message SearchPagesRequest { int32 organization_id = 1; string query = 2; int32 max_results = 3; }
+message SearchPagesResponse { repeated Page pages = 1; int32 total_matches = 2; }

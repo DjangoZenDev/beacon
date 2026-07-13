@@ -1,0 +1,71 @@
+# Kubernetes StatefulSet — CockroachDB 3-Node with Geo-Partitioning Labels
+# Chapter 13: Multi-Region / Kubernetes
+# 3-node CockroachDB cluster. Each pod is labeled with its region.
+# Geo-partitioning: data is pinned to the region where it is most accessed.
+# Principle 17: "Autonomous degradation beats central coordination."
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: cockroachdb
+  namespace: beacon-prod
+  labels:
+    app: cockroachdb
+    chapter: "13"
+spec:
+  serviceName: cockroachdb
+  replicas: 3
+  selector:
+    matchLabels:
+      app: cockroachdb
+  template:
+    metadata:
+      labels:
+        app: cockroachdb
+        region: "us-east"  # Overridden per region by kustomize
+    spec:
+      containers:
+        - name: cockroachdb
+          image: cockroachdb/cockroach:v24.1.0
+          args:
+            - start
+            - --insecure
+            - --join=cockroachdb-0.cockroachdb,cockroachdb-1.cockroachdb,cockroachdb-2.cockroachdb
+            - --cache=25%
+            - --max-sql-memory=25%
+            - --locality=region=$(REGION)
+          ports:
+            - containerPort: 26257
+              name: sql
+            - containerPort: 8080
+              name: http
+          env:
+            - name: REGION
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['topology.kubernetes.io/region']
+          volumeMounts:
+            - name: datadir
+              mountPath: /cockroach/cockroach-data
+          resources:
+            requests:
+              cpu: "2"
+              memory: "4Gi"
+            limits:
+              cpu: "4"
+              memory: "8Gi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+  volumeClaimTemplates:
+    - metadata:
+        name: datadir
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 100Gi
+        storageClassName: standard

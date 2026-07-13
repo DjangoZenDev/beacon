@@ -1,0 +1,128 @@
+// Beacon v0.7 — Page Service gRPC Protocol Definition
+//
+// Chapter 7: The page-service is the first extraction from the monolith.
+// It exposes CRUD operations for Pages and Links over gRPC with
+// protocol buffers as the contract language.
+//
+// Version: v1
+// Backward compatibility: non-negotiable. Deprecate fields; never remove them.
+
+syntax = "proto3";
+
+package page.v1;
+
+option go_package = "github.com/beacon/page-service/proto/page/v1;pagev1";
+
+// ── Page Service ─────────────────────────────────────────────────
+
+service PageService {
+    // Get a single page by its organization_id and slug.
+    rpc GetPage(GetPageRequest) returns (GetPageResponse);
+
+    // List pages within an organization, with optional search.
+    rpc ListPages(ListPagesRequest) returns (ListPagesResponse);
+
+    // Create a new page.
+    rpc CreatePage(CreatePageRequest) returns (CreatePageResponse);
+
+    // Update an existing page.
+    rpc UpdatePage(UpdatePageRequest) returns (UpdatePageResponse);
+
+    // Delete a page.
+    rpc DeletePage(DeletePageRequest) returns (DeletePageResponse);
+
+    // Search pages across an organization by title or body content.
+    rpc SearchPages(SearchPagesRequest) returns (SearchPagesResponse);
+}
+
+// ── Messages ─────────────────────────────────────────────────────
+
+// Page represents a single knowledge document in Beacon.
+message Page {
+    int64 id = 1;
+    int32 organization_id = 2;
+    string title = 3;
+    string slug = 4;
+    string body = 5;
+    int64 author_id = 6;
+    int32 incoming_count = 7;
+    int32 outgoing_count = 8;
+    string created_at = 9;   // ISO 8601 timestamp
+    string updated_at = 10;  // ISO 8601 timestamp
+}
+
+// ── GetPage ──────────────────────────────────────────────────────
+
+message GetPageRequest {
+    int32 organization_id = 1;
+    string slug = 2;
+}
+
+message GetPageResponse {
+    Page page = 1;
+}
+
+// ── ListPages ────────────────────────────────────────────────────
+
+message ListPagesRequest {
+    int32 organization_id = 1;
+    int32 page_size = 2;     // default 20, max 100
+    string page_token = 3;   // cursor-based pagination token
+    string order_by = 4;     // "updated_at", "incoming_count"
+}
+
+message ListPagesResponse {
+    repeated Page pages = 1;
+    string next_page_token = 2;
+    int32 total_count = 3;
+}
+
+// ── CreatePage ───────────────────────────────────────────────────
+
+message CreatePageRequest {
+    int32 organization_id = 1;
+    string title = 2;
+    string body = 3;
+    int64 author_id = 4;
+}
+
+message CreatePageResponse {
+    Page page = 1;
+}
+
+// ── UpdatePage ───────────────────────────────────────────────────
+
+message UpdatePageRequest {
+    int32 organization_id = 1;
+    string slug = 2;
+    string title = 3;
+    string body = 4;
+}
+
+message UpdatePageResponse {
+    Page page = 1;
+}
+
+// ── DeletePage ───────────────────────────────────────────────────
+
+message DeletePageRequest {
+    int32 organization_id = 1;
+    string slug = 2;
+}
+
+message DeletePageResponse {
+    bool success = 1;
+}
+
+// ── SearchPages ──────────────────────────────────────────────────
+
+message SearchPagesRequest {
+    int32 organization_id = 1;
+    string query = 2;
+    int32 max_results = 3;   // default 20, max 50
+}
+
+message SearchPagesResponse {
+    repeated Page pages = 1;
+    int32 total_matches = 2;
+}

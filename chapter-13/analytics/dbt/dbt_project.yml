@@ -1,0 +1,19 @@
+
+# dbt Project Configuration — Beacon Analytics v0.13
+name: 'beacon_analytics'
+version: '1.0'
+config-version: 2
+profile: 'beacon_analytics'
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+clean-targets: ["target", "dbt_packages"]
+models:
+  beacon_analytics:
+    +materialized: table
+    weekly_active_users:
+      +materialized: table
+      +tags: ["weekly", "dashboard"]

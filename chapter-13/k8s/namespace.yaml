@@ -1,0 +1,14 @@
+# Kubernetes Namespace — Beacon Production
+# Chapter 13: Multi-Region / Kubernetes
+# Defines the beacon-prod namespace for all Beacon workloads.
+# Applied per region: us-east, eu-west, ap-south.
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: beacon-prod
+  labels:
+    name: beacon-prod
+    app: beacon
+    environment: production
+    chapter: "13"

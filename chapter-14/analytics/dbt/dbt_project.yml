@@ -1,0 +1,4 @@
+# dbt Project (v0.14)
+name: 'beacon_analytics'; version: '1.0'; config-version: 2; profile: 'beacon_analytics'
+model-paths: ["models"]; clean-targets: ["target", "dbt_packages"]
+models: {beacon_analytics: {+materialized: table, weekly_active_users: {+materialized: table, +tags: ["weekly", "dashboard"]}}}

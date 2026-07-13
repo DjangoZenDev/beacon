@@ -1,0 +1,44 @@
+# Beacon v0.12 — Docker Compose with Analytics Sidecar
+# Chapter 12: Data Lakes and the Analytical Sidecar
+# Adds ClickHouse and Kafka Connect for CDC pipeline.
+version: "3.9"
+services:
+  beacon:
+    build: .
+    ports: ["8000:8000"]
+    environment:
+      DATABASE_URL: postgres://beacon:beacon_dev@postgres:5432/beacon
+      REDIS_URL: redis://redis:6379/0
+      KAFKA_BROKERS: kafka:9092
+      CLICKHOUSE_HOST: clickhouse
+    depends_on: [postgres, redis, kafka, clickhouse]
+
+  postgres:
+    image: postgres:16
+    environment: {POSTGRES_DB: beacon, POSTGRES_USER: beacon, POSTGRES_PASSWORD: beacon_dev}
+    ports: ["5432:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+
+  elasticsearch:
+    image: elasticsearch:8.11.0
+    environment: {discovery.type: single-node, xpack.security.enabled: "false"}
+    ports: ["9200:9200"]
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    environment: {KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092, KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1}
+    ports: ["9092:9092"]
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.1
+    ports: ["8123:8123", "9000:9000"]
+    environment: {CLICKHOUSE_DB: beacon_analytics}
+    volumes: [clickhouse_data:/var/lib/clickhouse]
+
+volumes:
+  pgdata:
+  clickhouse_data:

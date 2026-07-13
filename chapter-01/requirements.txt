@@ -1,0 +1,8 @@
+# Beacon v0.1 — Chapter 1: A Single Server and a Dream
+#
+# This is the complete Django project as it stands at the end of Chapter 1.
+# Run with: python manage.py runserver
+
+# ── requirements.txt ──────────────────────────────────────────────
+Django==5.1.0
+gunicorn==22.0.0

@@ -1,0 +1,34 @@
+# Istio Gateway — Ingress Gateway for Beacon
+# Chapter 13: Multi-Region / Kubernetes
+# Istio Gateway replaces nginx Ingress for service-mesh-native routing.
+# TLS termination with cert-manager provisioned certificates.
+
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: beacon-gateway
+  namespace: beacon-prod
+  labels:
+    app: beacon
+    chapter: "13"
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+        - beacon.example.com
+      tls:
+        httpsRedirect: true
+    - port:
+        number: 443
+        name: https
+        protocol: HTTPS
+      hosts:
+        - beacon.example.com
+      tls:
+        mode: SIMPLE
+        credentialName: beacon-tls

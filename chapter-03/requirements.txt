@@ -1,0 +1,17 @@
+# Beacon v0.3 — Chapter 3: Caching Everything That Moves
+#
+# Chapter 3 adds Redis caching to reduce database load.
+# Run with: python manage.py runserver
+#
+# Prerequisites:
+#   - PostgreSQL 16+ running on localhost:5432
+#   - pgbouncer configured for connection pooling (localhost:6432)
+#   - Redis 7+ running on localhost:6379
+
+# ── requirements.txt ──────────────────────────────────────────────
+Django==5.1.0
+psycopg2-binary==2.9.10
+gunicorn==22.0.0
+locust==2.31.0
+django-redis==5.4.0
+redis==5.2.0

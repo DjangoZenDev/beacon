@@ -1,0 +1,15 @@
+# Beacon v0.2 — Chapter 2: The First Thousand Users
+#
+# Chapter 2 replaces SQLite with PostgreSQL and adds connection pooling.
+# Run with: python manage.py runserver
+#
+# Prerequisites:
+#   - PostgreSQL 16+ running on localhost:5432
+#   - pgbouncer configured for connection pooling
+#   - Createdb beacon_ch2
+
+# ── requirements.txt ──────────────────────────────────────────────
+Django==5.1.0
+psycopg2-binary==2.9.10
+gunicorn==22.0.0
+locust==2.31.0

@@ -1,0 +1,22 @@
+# Beacon v0.4 — Chapter 4: The Monolith Groans
+#
+# Chapter 4 adds Celery for background tasks and external API caching.
+# Run with: python manage.py runserver
+#
+# Celery worker: celery -A beacon worker -l info
+#
+# Prerequisites:
+#   - PostgreSQL 16+ running on localhost:5432
+#   - pgbouncer configured for connection pooling (localhost:6432)
+#   - Redis 7+ running on localhost:6379 (cache + message broker)
+
+# ── requirements.txt ──────────────────────────────────────────────
+Django==5.1.0
+psycopg2-binary==2.9.10
+gunicorn==22.0.0
+locust==2.31.0
+django-redis==5.4.0
+redis==5.2.0
+celery==5.4.0
+django-celery-results==2.5.1
+requests==2.32.0

@@ -1,0 +1,38 @@
+
+# Beacon v0.14 — Requirements
+# Chapter 14: Observability — OpenTelemetry, Prometheus, Jaeger, structlog
+# Carries forward all Chapter 13 dependencies plus observability stack.
+
+Django==5.1.0
+psycopg2-binary==2.9.10
+gunicorn==22.0.0
+locust==2.31.0
+django-redis==5.4.0
+redis==5.2.0
+celery==5.4.0
+django-celery-results==2.5.1
+requests==2.32.0
+etcd3==0.12.0
+grpcio==1.68.0
+grpcio-tools==1.68.0
+protobuf==5.29.0
+djangorestframework==3.15.0
+kafka-python==2.0.2
+confluent-kafka==2.6.0
+channels==4.2.0
+daphne==4.1.0
+channels-redis==4.2.0
+elasticsearch==8.15.0
+elasticsearch-dsl==8.15.0
+apache-flink==1.19.0
+clickhouse-driver==0.2.8
+pyiceberg==0.7.0
+kubernetes==30.1.0
+
+# ── Chapter 14: Observability ────────────────────────────────
+opentelemetry-api==1.27.0
+opentelemetry-sdk==1.27.0
+opentelemetry-instrumentation-django==0.48b0
+opentelemetry-exporter-jaeger==1.21.0
+django-prometheus==2.3.1
+structlog==24.4.0

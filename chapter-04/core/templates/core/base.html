@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+{% load static %}
+{% load beacon_wikilinks %}
+{% load cache %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Beacon{% endblock %}</title>
+    <style>
+        :root {
+            --color-bg: #fafafa;
+            --color-surface: #ffffff;
+            --color-text: #1a1a2e;
+            --color-text-secondary: #5a5a7a;
+            --color-border: #e2e2ea;
+            --color-primary: #2563eb;
+            --color-primary-hover: #1d4ed8;
+            --color-danger: #dc2626;
+            --color-link: #2563eb;
+            --radius: 6px;
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            --font-mono: "SF Mono", "Fira Code", "Fira Mono", monospace;
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: var(--font-sans);
+            background: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: var(--spacing-md);
+        }
+        header {
+            background: var(--color-surface);
+            border-bottom: 1px solid var(--color-border);
+            padding: var(--spacing-md) 0;
+            margin-bottom: var(--spacing-xl);
+        }
+        header .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+        header h1 a {
+            color: var(--color-text);
+            text-decoration: none;
+        }
+        nav a {
+            color: var(--color-link);
+            text-decoration: none;
+            margin-left: var(--spacing-md);
+            font-size: 0.9rem;
+        }
+        nav a:hover { text-decoration: underline; }
+        .page-layout {
+            display: grid;
+            grid-template-columns: 1fr 280px;
+            gap: var(--spacing-xl);
+            align-items: start;
+        }
+        .page-layout main { min-width: 0; }
+        .sidebar {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius);
+            padding: var(--spacing-md);
+            font-size: 0.875rem;
+        }
+        .sidebar h3 {
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--color-text-secondary);
+            margin-bottom: var(--spacing-sm);
+        }
+        .sidebar ul { list-style: none; }
+        .sidebar li { margin-bottom: var(--spacing-xs); }
+        .sidebar a {
+            color: var(--color-link);
+            text-decoration: none;
+        }
+        .sidebar a:hover { text-decoration: underline; }
+        .sidebar .snippet {
+            font-size: 0.8rem;
+            color: var(--color-text-secondary);
+            margin-bottom: var(--spacing-xs);
+        }
+        .card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius);
+            padding: var(--spacing-md) var(--spacing-lg);
+            margin-bottom: var(--spacing-md);
+        }
+        .card h2 {
+            font-size: 1.1rem;
+            margin-bottom: var(--spacing-xs);
+        }
+        .card h2 a {
+            color: var(--color-text);
+            text-decoration: none;
+        }
+        .card h2 a:hover { color: var(--color-primary); }
+        .card .meta {
+            font-size: 0.8rem;
+            color: var(--color-text-secondary);
+        }
+        .card .wikilink {
+            color: var(--color-primary);
+            text-decoration: none;
+            border-bottom: 1px dashed var(--color-primary);
+        }
+        .card .wikilink:hover { border-bottom-style: solid; }
+        .search-form {
+            margin-bottom: var(--spacing-lg);
+        }
+        .search-form input[type="search"] {
+            width: 100%;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius);
+            font-size: 0.95rem;
+            font-family: var(--font-sans);
+        }
+        .pagination {
+            display: flex;
+            gap: var(--spacing-sm);
+            justify-content: center;
+            margin-top: var(--spacing-lg);
+        }
+        .pagination a, .pagination span {
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius);
+            text-decoration: none;
+            color: var(--color-link);
+            font-size: 0.9rem;
+        }
+        .pagination span.current {
+            background: var(--color-primary);
+            color: white;
+            border-color: var(--color-primary);
+        }
+        .empty-state {
+            text-align: center;
+            padding: var(--spacing-xl);
+            color: var(--color-text-secondary);
+        }
+        .btn {
+            display: inline-block;
+            padding: var(--spacing-sm) var(--spacing-lg);
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            text-decoration: none;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        .btn:hover { background: var(--color-primary-hover); }
+        .btn-secondary {
+            background: transparent;
+            color: var(--color-link);
+            border: 1px solid var(--color-border);
+        }
+        .btn-secondary:hover { background: var(--color-bg); }
+        form label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+            margin-top: var(--spacing-md);
+        }
+        form input[type="text"],
+        form textarea {
+            width: 100%;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius);
+            font-size: 0.95rem;
+            font-family: var(--font-sans);
+        }
+        form textarea {
+            min-height: 300px;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            line-height: 1.7;
+        }
+        .actions {
+            margin-top: var(--spacing-lg);
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+        .page-body {
+            line-height: 1.8;
+            margin: var(--spacing-lg) 0;
+        }
+        .page-body .wikilink {
+            color: var(--color-primary);
+            text-decoration: none;
+            border-bottom: 1px dashed var(--color-primary);
+        }
+        .page-body .wikilink:hover { border-bottom-style: solid; }
+        @media (max-width: 768px) {
+            .page-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1><a href="{% url 'page_list' %}">Beacon</a></h1>
+            <nav>
+                <a href="{% url 'page_list' %}">Pages</a>
+                <a href="{% url 'page_edit' slug='new' %}">+ New</a>
+                {% if user.is_authenticated %}
+                    <span style="font-size:0.85rem;color:var(--color-text-secondary);">{{ user.username }}</span>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

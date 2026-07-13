@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.Python
+
+# Virtual environments
+venv/
+beacon_env/
+.venv/
+env/
+
+# Django
+*.sqlite3
+db.sqlite3
+/media/
+/staticfiles/
+local_settings.py
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Editors / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Test / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Terraform state (chapter 15)
+.terraform/
+*.tfstate
+*.tfstate.*

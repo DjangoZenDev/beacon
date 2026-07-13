@@ -1,0 +1,25 @@
+# Kubernetes ConfigMap — Beacon Configuration
+# Chapter 14: Observability When Things Go Dark
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: beacon-config
+  namespace: beacon-prod
+  labels:
+    app: beacon
+    chapter: "14"
+data:
+  DJANGO_SETTINGS_MODULE: "beacon.settings"
+  DEBUG: "false"
+  LOG_LEVEL: "info"
+  COCKROACH_HOST: "cockroachdb-public.beacon-prod.svc.cluster.local"
+  COCKROACH_PORT: "26257"
+  COCKROACH_DB: "beacon"
+  REDIS_URL: "redis://redis:6379/0"
+  ELASTICSEARCH_HOSTS: "http://elasticsearch:9200"
+  KAFKA_BROKERS: "kafka:9092"
+  CLICKHOUSE_HOST: "clickhouse"
+  CLICKHOUSE_PORT: "9000"
+  JAEGER_HOST: "jaeger-agent"
+  OTEL_SERVICE_NAME: "beacon"
+  OTEL_EXPORTER_JAEGER_ENDPOINT: "http://jaeger-collector:14268/api/traces"

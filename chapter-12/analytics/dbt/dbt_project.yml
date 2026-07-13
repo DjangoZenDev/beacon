@@ -1,0 +1,47 @@
+# dbt Project Configuration — Beacon Analytics
+#
+# Defines the dbt project for Beacon's analytical transformation pipeline.
+# Models are materialized as tables in ClickHouse (hot data, last 90 days)
+# or written to Apache Iceberg (historical data archive).
+#
+# Chapter 12, Principle 5: "Data retention is a tiered strategy."
+#   Hot data → ClickHouse (90 days). Warm data → Iceberg on S3 (years).
+#   Cold data → Glacier (forever, slow to query).
+
+name: 'beacon_analytics'
+version: '1.0'
+config-version: 2
+
+# This profile references ClickHouse connection settings.
+# Configure in ~/.dbt/profiles.yml:
+#   beacon_analytics:
+#     target: dev
+#     outputs:
+#       dev:
+#         type: clickhouse
+#         schema: beacon_analytics
+#         host: localhost
+#         port: 9000
+#         user: default
+#         password: ''
+profile: 'beacon_analytics'
+
+# Directories for model SQL files and analysis.
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# Model materialization defaults.
+models:
+  beacon_analytics:
+    +materialized: table
+    weekly_active_users:
+      +materialized: table
+      +tags: ["weekly", "dashboard"]

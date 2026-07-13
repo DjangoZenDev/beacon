@@ -1,0 +1,40 @@
+# Istio DestinationRule — Regional Subsets
+# Chapter 13: Multi-Region / Kubernetes
+# Defines subsets for each region so VirtualService can route by region.
+# Traffic policy: LEAST_REQUEST load balancing for even distribution.
+
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: beacon-dr
+  namespace: beacon-prod
+  labels:
+    app: beacon
+    chapter: "13"
+spec:
+  host: beacon-django.beacon-prod.svc.cluster.local
+  trafficPolicy:
+    loadBalancer:
+      simple: LEAST_REQUEST
+    connectionPool:
+      tcp:
+        maxConnections: 100
+      http:
+        http1MaxPendingRequests: 50
+        http2MaxRequests: 100
+        maxRequestsPerConnection: 2
+    outlierDetection:
+      consecutive5xxErrors: 3
+      interval: 30s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 50
+  subsets:
+    - name: us-east
+      labels:
+        region: us-east
+    - name: eu-west
+      labels:
+        region: eu-west
+    - name: ap-south
+      labels:
+        region: ap-south

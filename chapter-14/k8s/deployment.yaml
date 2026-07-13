@@ -1,0 +1,62 @@
+# Kubernetes Deployment — Beacon Django Application
+# Chapter 14: Observability When Things Go Dark
+# 3 replicas with OpenTelemetry sidecar and Prometheus metrics.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: beacon-django
+  namespace: beacon-prod
+  labels:
+    app: beacon
+    component: django
+    chapter: "14"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: beacon
+      component: django
+  template:
+    metadata:
+      labels:
+        app: beacon
+        component: django
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+        prometheus.io/path: "/metrics/"
+    spec:
+      containers:
+        - name: beacon
+          image: beacon:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+              protocol: TCP
+          env:
+            - name: DJANGO_SETTINGS_MODULE
+              value: "beacon.settings"
+            - name: JAEGER_HOST
+              value: "jaeger-agent"
+          envFrom:
+            - configMapRef:
+                name: beacon-config
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+            limits:
+              cpu: "2"
+              memory: "2Gi"
+          readinessProbe:
+            httpGet:
+              path: /health/
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health/
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 10

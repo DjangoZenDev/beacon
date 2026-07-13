@@ -1,0 +1,12 @@
+from django.contrib import admin
+from django.urls import path, include
+from core import views
+
+urlpatterns = [
+    path("", include("django_prometheus.urls")),
+    path("admin/", admin.site.urls),
+    path("api/", include("core.api_urls")),
+    path("", views.PageListView.as_view(), name="page_list"),
+    path("page/<slug:slug>/", views.PageDetailView.as_view(), name="page_detail"),
+    path("page/<slug:slug>/edit/", views.PageEditView.as_view(), name="page_edit"),
+]

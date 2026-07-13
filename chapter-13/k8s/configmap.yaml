@@ -1,0 +1,36 @@
+# Kubernetes ConfigMap — Beacon Non-Secret Configuration
+# Chapter 13: Multi-Region / Kubernetes
+# Non-secret config injected into pods as environment variables.
+# Secrets (DB passwords, API keys) use Kubernetes Secrets, not ConfigMap.
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: beacon-config
+  namespace: beacon-prod
+  labels:
+    app: beacon
+    chapter: "13"
+data:
+  DJANGO_SETTINGS_MODULE: "beacon.settings"
+  DEBUG: "false"
+  LOG_LEVEL: "info"
+  # CockroachDB regional hosts — injected per region by kustomize.
+  COCKROACH_HOST: "cockroachdb-public.beacon-prod.svc.cluster.local"
+  COCKROACH_PORT: "26257"
+  COCKROACH_DB: "beacon"
+  # Redis
+  REDIS_URL: "redis://redis:6379/0"
+  # Elasticsearch
+  ELASTICSEARCH_HOSTS: "http://elasticsearch:9200"
+  # Kafka
+  KAFKA_BROKERS: "kafka:9092"
+  # ClickHouse
+  CLICKHOUSE_HOST: "clickhouse"
+  CLICKHOUSE_PORT: "9000"
+  # Service addresses
+  PAGE_SERVICE_ADDR: "page-service:50051"
+  # Feed config
+  FEED_CELEBRITY_THRESHOLD: "10000"
+  FEED_ACTIVE_WINDOW_DAYS: "30"
+  FEED_MAX_ITEMS: "500"

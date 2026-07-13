@@ -1,0 +1,119 @@
+# Prometheus Alerting Rules — Beacon v0.14
+# Chapter 14: Observability
+# Alert on symptoms, not causes. Every alert must require immediate human action.
+
+groups:
+  - name: beacon_alerts
+    rules:
+      # ── Latency ──────────────────────────────────────────
+      - alert: HighLatency
+        expr: |
+          histogram_quantile(0.95, rate(beacon_request_duration_seconds_bucket[5m])) > 0.5
+        for: 5m
+        labels:
+          severity: warning
+          chapter: "14"
+        annotations:
+          summary: "P95 request latency > 500ms for {{ $labels.view_name }}"
+          description: >
+            The P95 latency for {{ $labels.view_name }} in region {{ $labels.region }}
+            is {{ $value | humanizeDuration }}.
+            Runbook: https://wiki.beacon.internal/runbooks/high-latency
+
+      - alert: CriticalLatency
+        expr: |
+          histogram_quantile(0.99, rate(beacon_request_duration_seconds_bucket[5m])) > 2.0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "P99 latency > 2s for {{ $labels.view_name }}"
+          description: >
+            Users are experiencing severe latency. P99 = {{ $value | humanizeDuration }}.
+            Immediate investigation required.
+
+      # ── Error Rate ────────────────────────────────────────
+      - alert: HighErrorRate
+        expr: |
+          rate(beacon_page_views_total{status="error"}[5m]) /
+          rate(beacon_page_views_total[5m]) > 0.01
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Error rate > 1% on {{ $labels.page_slug }}"
+          description: >
+            Error rate is {{ $value | humanizePercentage }} for page {{ $labels.page_slug }}
+            in region {{ $labels.region }}. Runbook: https://wiki.beacon.internal/runbooks/high-error-rate
+
+      # ── Replication Lag ───────────────────────────────────
+      - alert: ReplicationLag
+        expr: |
+          cockroach_ranges_unavailable > 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "CockroachDB replication lag detected in {{ $labels.region }}"
+          description: >
+            {{ $value }} ranges are unavailable. Replication lag may cause stale reads.
+            Check cross-region network latency.
+
+      - alert: SevereReplicationLag
+        expr: |
+          cockroach_ranges_unavailable > 5
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Severe CockroachDB replication lag: {{ $value }} ranges unavailable"
+          description: >
+            More than 5 ranges unavailable for > 5 minutes.
+            Cross-region network partition possible. Page on-call immediately.
+
+      # ── Disk ──────────────────────────────────────────────
+      - alert: DiskFull
+        expr: |
+          (node_filesystem_avail_bytes / node_filesystem_size_bytes) < 0.15
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Disk > 85% full on {{ $labels.instance }}"
+          description: >
+            Only {{ $value | humanizePercentage }} disk remaining.
+            Extend volume or clean up before it reaches 90%.
+
+      - alert: DiskCritical
+        expr: |
+          (node_filesystem_avail_bytes / node_filesystem_size_bytes) < 0.05
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Disk > 95% full on {{ $labels.instance }}"
+          description: "Imminent disk full. Extend immediately."
+
+      # ── Kafka Consumer Lag ────────────────────────────────
+      - alert: KafkaConsumerLag
+        expr: |
+          beacon_kafka_consumer_lag > 10000
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Kafka consumer lag > 10k on {{ $labels.topic }} / {{ $labels.consumer_group }}"
+          description: >
+            Consumer {{ $labels.consumer_group }} is {{ $value }} messages behind on {{ $labels.topic }}.
+            Check consumer health and processing throughput.
+
+      # ── Memory ────────────────────────────────────────────
+      - alert: HighMemoryUsage
+        expr: |
+          (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) > 0.90
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Memory usage > 90% on {{ $labels.instance }}"
+          description: "Memory pressure. Check for memory leaks or increase limits."

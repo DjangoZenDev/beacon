@@ -1,0 +1,17 @@
+{% extends "core/base.html" %}{% load beacon_wikilinks %}{% load cache %}
+{% block title %}{{ page.title }} — Beacon{% endblock %}
+{% block content %}
+<div class="page-layout"><main><article>
+<h2 style="font-size:1.5rem;margin-bottom:var(--spacing-xs);">{{ page.title }}</h2>
+<div class="meta" style="margin-bottom:var(--spacing-lg);">by {{ page.author.username }} — Org #{{ page.organization_id }} — created {{ page.created_at|date:"M j, Y" }} — updated {{ page.updated_at|date:"M j, Y" }} — {{ page.incoming_count }} backlinks</div>
+<div class="page-body">{{ page.body|render_wikilinks }}</div>
+</article>
+<div class="actions"><a href="{% url 'page_edit' slug=page.slug %}" class="btn">Edit</a><a href="{% url 'page_list' %}" class="btn btn-secondary">All Pages</a></div>
+</main>
+<aside>{% cache 300 "sidebar" page.slug page.organization_id %}
+{% if outgoing_pages %}<div class="sidebar"><h3>Links To ({{ page.outgoing_count }})</h3><ul>{% for target in outgoing_pages %}<li><a href="{{ target.get_absolute_url }}">{{ target.title }}</a></li>{% endfor %}</ul></div>{% endif %}
+{% if incoming_links %}<div class="sidebar" style="margin-top:var(--spacing-md);"><h3>Backlinks ({{ page.incoming_count }})</h3><ul>{% for source in incoming_links %}<li><a href="{{ source.get_absolute_url }}">{{ source.title }}</a></li>{% endfor %}</ul></div>{% endif %}
+{% endcache %}
+{% if related_articles %}<div class="sidebar" style="margin-top:var(--spacing-md);"><h3>Related</h3><ul>{% for a in related_articles %}<li><a href="{{ a.url }}" target="_blank">{{ a.title }}</a>{% if a.snippet %}<div class="snippet">{{ a.snippet }}</div>{% endif %}</li>{% endfor %}</ul></div>{% endif %}
+</aside></div>
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends "core/base.html" %}
+{% block title %}{% if page %}Edit: {{ page.title }}{% else %}New Page{% endif %} — Beacon{% endblock %}
+{% block content %}
+<h2 style="margin-bottom:var(--spacing-lg);">{% if page %}Edit Page{% else %}New Page{% endif %}</h2>
+<form method="post">{% csrf_token %}{{ form.as_p }}
+<div class="actions"><button type="submit" class="btn">Save</button>{% if page %}<a href="{{ page.get_absolute_url }}" class="btn btn-secondary">Cancel</a>{% else %}<a href="{% url 'page_list' %}" class="btn btn-secondary">Cancel</a>{% endif %}</div>
+</form>
+{% if page %}<p style="margin-top:var(--spacing-md);font-size:.85rem;color:var(--color-text-secondary);">WikiLinks: use <code>[[Page Title]]</code> to link.</p>{% endif %}
+{% endblock %}

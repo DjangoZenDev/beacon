@@ -1,0 +1,6 @@
+# Kubernetes Namespace (v0.14) — carried from Ch13
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: beacon-prod
+  labels: {name: beacon-prod, app: beacon, environment: production, chapter: "14"}

@@ -1,0 +1,51 @@
+# Kubernetes ResourceQuota — Per-Namespace Limits
+# Chapter 15: The Cost of Scale
+# Prevents unbounded resource consumption by any single namespace.
+# Together with LimitRange, ensures every pod has explicit limits.
+
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: beacon-compute-quota
+  namespace: beacon-prod
+  labels:
+    app: beacon
+    chapter: "15"
+spec:
+  hard:
+    requests.cpu: "20"
+    requests.memory: "40Gi"
+    limits.cpu: "40"
+    limits.memory: "80Gi"
+    persistentvolumeclaims: "20"
+    services.loadbalancers: "3"
+
+---
+# LimitRange — Default Pod Resource Limits
+# Chapter 15: The Cost of Scale
+# Ensures every container has CPU/memory limits defined.
+# Pods without explicit limits get these defaults.
+
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: beacon-default-limits
+  namespace: beacon-prod
+  labels:
+    app: beacon
+    chapter: "15"
+spec:
+  limits:
+    - type: Container
+      default:
+        cpu: "500m"
+        memory: "512Mi"
+      defaultRequest:
+        cpu: "250m"
+        memory: "256Mi"
+      max:
+        cpu: "4"
+        memory: "8Gi"
+      min:
+        cpu: "100m"
+        memory: "128Mi"

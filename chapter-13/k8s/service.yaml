@@ -1,0 +1,23 @@
+# Kubernetes Service — Beacon Django (ClusterIP)
+# Chapter 13: Multi-Region / Kubernetes
+# Internal ClusterIP service. External access via Ingress/Istio Gateway.
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: beacon-django
+  namespace: beacon-prod
+  labels:
+    app: beacon
+    component: django
+    chapter: "13"
+spec:
+  type: ClusterIP
+  selector:
+    app: beacon
+    component: django
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8000
+      protocol: TCP

@@ -1,0 +1,19 @@
+# Beacon v0.12 — Chapter 12: Data Lakes and the Analytical Sidecar
+# Requirements for the analytical data pipeline.
+Django==5.1.0
+djangorestframework==3.15.1
+gunicorn==22.0.0
+psycopg2-binary==2.9.9
+redis==5.0.0
+celery==5.3.6
+django-celery-results==2.5.1
+channels==4.1.0
+daphne==4.1.0
+kafka-python==2.0.2
+elasticsearch==8.13.0
+protobuf==4.25.3
+grpcio==1.62.0
+clickhouse-driver==0.2.6
+pandas==2.2.0
+numpy==1.26.4
+pyarrow==15.0.0

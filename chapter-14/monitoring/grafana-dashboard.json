@@ -1,0 +1,177 @@
+{
+  "title": "Beacon v0.14 — Observability Dashboard",
+  "tags": ["beacon", "chapter-14", "observability"],
+  "timezone": "browser",
+  "panels": [
+    {
+      "id": 1,
+      "title": "Request Rate",
+      "type": "graph",
+      "gridPos": {"x": 0, "y": 0, "w": 12, "h": 8},
+      "targets": [
+        {
+          "expr": "rate(beacon_page_views_total[1m])",
+          "legendFormat": "{{ page_slug }} ({{ region }})"
+        }
+      ],
+      "yaxes": [{"label": "requests/sec", "format": "rps"}]
+    },
+    {
+      "id": 2,
+      "title": "Latency — P50 / P95 / P99",
+      "type": "graph",
+      "gridPos": {"x": 12, "y": 0, "w": 12, "h": 8},
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, rate(beacon_request_duration_seconds_bucket[5m]))",
+          "legendFormat": "P50 — {{ view_name }}"
+        },
+        {
+          "expr": "histogram_quantile(0.95, rate(beacon_request_duration_seconds_bucket[5m]))",
+          "legendFormat": "P95 — {{ view_name }}"
+        },
+        {
+          "expr": "histogram_quantile(0.99, rate(beacon_request_duration_seconds_bucket[5m]))",
+          "legendFormat": "P99 — {{ view_name }}"
+        }
+      ],
+      "yaxes": [{"label": "seconds", "format": "s"}]
+    },
+    {
+      "id": 3,
+      "title": "Error Rate",
+      "type": "graph",
+      "gridPos": {"x": 0, "y": 8, "w": 8, "h": 8},
+      "targets": [
+        {
+          "expr": "rate(beacon_page_views_total{status=\"error\"}[5m]) / rate(beacon_page_views_total[5m])",
+          "legendFormat": "{{ page_slug }}"
+        }
+      ],
+      "yaxes": [{"label": "error rate", "format": "percentunit"}],
+      "thresholds": [{"value": 0.01, "color": "red"}]
+    },
+    {
+      "id": 4,
+      "title": "Database Query Rate",
+      "type": "graph",
+      "gridPos": {"x": 8, "y": 8, "w": 8, "h": 8},
+      "targets": [
+        {
+          "expr": "rate(beacon_db_query_duration_seconds_count[5m])",
+          "legendFormat": "{{ operation }} ({{ shard }})"
+        }
+      ],
+      "yaxes": [{"label": "queries/sec", "format": "rps"}]
+    },
+    {
+      "id": 5,
+      "title": "Cache Hit Rate",
+      "type": "graph",
+      "gridPos": {"x": 16, "y": 8, "w": 8, "h": 8},
+      "targets": [
+        {
+          "expr": "rate(redis_keyspace_hits_total[5m]) / (rate(redis_keyspace_hits_total[5m]) + rate(redis_keyspace_misses_total[5m]))",
+          "legendFormat": "hit rate"
+        }
+      ],
+      "yaxes": [{"label": "hit rate", "format": "percentunit"}],
+      "thresholds": [{"value": 0.80, "color": "yellow"}]
+    },
+    {
+      "id": 6,
+      "title": "Replication Lag",
+      "type": "graph",
+      "gridPos": {"x": 0, "y": 16, "w": 8, "h": 8},
+      "targets": [
+        {
+          "expr": "cockroach_ranges_unavailable",
+          "legendFormat": "{{ region }}"
+        }
+      ],
+      "yaxes": [{"label": "unavailable ranges", "format": "short"}],
+      "thresholds": [{"value": 1, "color": "red"}]
+    },
+    {
+      "id": 7,
+      "title": "Celery Task Rate",
+      "type": "graph",
+      "gridPos": {"x": 8, "y": 16, "w": 8, "h": 8},
+      "targets": [
+        {
+          "expr": "rate(celery_tasks_total[5m])",
+          "legendFormat": "{{ task_name }} — {{ state }}"
+        }
+      ],
+      "yaxes": [{"label": "tasks/sec", "format": "rps"}]
+    },
+    {
+      "id": 8,
+      "title": "Kafka Consumer Lag",
+      "type": "graph",
+      "gridPos": {"x": 16, "y": 16, "w": 8, "h": 8},
+      "targets": [
+        {
+          "expr": "beacon_kafka_consumer_lag",
+          "legendFormat": "{{ topic }} / {{ consumer_group }} ({{ region }})"
+        }
+      ],
+      "yaxes": [{"label": "messages", "format": "short"}],
+      "thresholds": [{"value": 10000, "color": "yellow"}]
+    },
+    {
+      "id": 9,
+      "title": "Active Users (WebSocket)",
+      "type": "stat",
+      "gridPos": {"x": 0, "y": 24, "w": 6, "h": 4},
+      "targets": [
+        {
+          "expr": "sum(beacon_active_users)",
+          "legendFormat": ""
+        }
+      ],
+      "options": {"colorMode": "value", "graphMode": "area"}
+    },
+    {
+      "id": 10,
+      "title": "CRDT Documents",
+      "type": "stat",
+      "gridPos": {"x": 6, "y": 24, "w": 6, "h": 4},
+      "targets": [
+        {
+          "expr": "sum(beacon_crdt_document_count)",
+          "legendFormat": ""
+        }
+      ],
+      "options": {"colorMode": "value", "graphMode": "area"}
+    },
+    {
+      "id": 11,
+      "title": "CPU Usage",
+      "type": "graph",
+      "gridPos": {"x": 12, "y": 24, "w": 6, "h": 4},
+      "targets": [
+        {
+          "expr": "rate(container_cpu_usage_seconds_total{namespace=\"beacon-prod\"}[5m])",
+          "legendFormat": "{{ pod }}"
+        }
+      ],
+      "yaxes": [{"label": "CPU cores", "format": "short"}]
+    },
+    {
+      "id": 12,
+      "title": "Memory Usage",
+      "type": "graph",
+      "gridPos": {"x": 18, "y": 24, "w": 6, "h": 4},
+      "targets": [
+        {
+          "expr": "container_memory_working_set_bytes{namespace=\"beacon-prod\"}",
+          "legendFormat": "{{ pod }}"
+        }
+      ],
+      "yaxes": [{"label": "bytes", "format": "bytes"}]
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 27
+}

@@ -1,0 +1,24 @@
+# Beacon v0.6 — Chapter 6: Sharding Beacon's Knowledge Graph
+#
+# Chapter 6 adds horizontal sharding across 4 PostgreSQL shard databases,
+# consistent hashing with etcd3 for ring management, and dual-write backfill
+# for safe resharding.
+#
+# Prerequisites:
+#   - PostgreSQL 16+ shard-0 through shard-3
+#   - etcd3 running on localhost:2379
+#   - PostgreSQL 16+ replica on 192.168.1.11:5432 (streaming replication)
+#   - pgbouncer configured for connection pooling
+#   - Redis 7+ running on localhost:6379 (cache + message broker)
+
+# ── requirements.txt ──────────────────────────────────────────────
+Django==5.1.0
+psycopg2-binary==2.9.10
+gunicorn==22.0.0
+locust==2.31.0
+django-redis==5.4.0
+redis==5.2.0
+celery==5.4.0
+django-celery-results==2.5.1
+requests==2.32.0
+etcd3==0.12.0

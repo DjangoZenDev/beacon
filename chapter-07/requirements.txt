@@ -1,0 +1,29 @@
+# Beacon v0.7 — Chapter 7: The Monolith Becomes a Service
+#
+# Chapter 7 splits the monolith into gRPC microservices: page-service,
+# search-service, notify-service, and collab-service. Adds DRF for REST
+# API endpoints. Docker Compose for local development.
+#
+# Prerequisites:
+#   - PostgreSQL 16+ shard-0 through shard-3
+#   - etcd3 running on localhost:2379
+#   - Redis 7+ running on localhost:6379
+#   - Elasticsearch 8.x for search-service
+#   - Kafka for event streaming (Chapter 8)
+
+# ── requirements.txt ──────────────────────────────────────────────
+Django==5.1.0
+psycopg2-binary==2.9.10
+gunicorn==22.0.0
+locust==2.31.0
+django-redis==5.4.0
+redis==5.2.0
+celery==5.4.0
+django-celery-results==2.5.1
+requests==2.32.0
+etcd3==0.12.0
+grpcio==1.68.0
+grpcio-tools==1.68.0
+protobuf==5.29.0
+djangorestframework==3.15.0
+channels==4.2.0

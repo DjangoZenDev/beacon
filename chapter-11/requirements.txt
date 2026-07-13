@@ -1,0 +1,36 @@
+# Beacon v0.11 — Chapter 11: Activity Feed
+#
+# Chapter 11 builds the activity feed: fan-out-on-write (Redis sorted
+# sets) blended with fan-out-on-read (EventStore fallback), celebrity
+# optimization, and Apache Flink for stream processing.
+#
+# Prerequisites:
+#   - PostgreSQL 16+ shard-0 through shard-3
+#   - Redis 7+ running on localhost:6379
+#   - Kafka running on localhost:9092
+#   - Elasticsearch 8.x cluster
+#   - Apache Flink 1.18+ (via pyflink) for stream processing
+
+# ── requirements.txt ──────────────────────────────────────────────
+Django==5.1.0
+psycopg2-binary==2.9.10
+gunicorn==22.0.0
+locust==2.31.0
+django-redis==5.4.0
+redis==5.2.0
+celery==5.4.0
+django-celery-results==2.5.1
+requests==2.32.0
+etcd3==0.12.0
+grpcio==1.68.0
+grpcio-tools==1.68.0
+protobuf==5.29.0
+djangorestframework==3.15.0
+kafka-python==2.0.2
+confluent-kafka==2.6.0
+channels==4.2.0
+daphne==4.1.0
+channels-redis==4.2.0
+elasticsearch==8.15.0
+elasticsearch-dsl==8.15.0
+apache-flink==1.19.0

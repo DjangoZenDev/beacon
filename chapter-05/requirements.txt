@@ -1,0 +1,23 @@
+# Beacon v0.5 — Chapter 5: Read Replicas and the Split Brain
+#
+# Chapter 5 adds read replicas, denormalized link counts, and a
+# database router for read/write splitting.
+# Run with: python manage.py runserver
+# Celery worker: celery -A beacon worker -l info
+#
+# Prerequisites:
+#   - PostgreSQL 16+ primary on 192.168.1.10:5432
+#   - PostgreSQL 16+ replica on 192.168.1.11:5432 (streaming replication)
+#   - pgbouncer configured for connection pooling
+#   - Redis 7+ running on localhost:6379 (cache + message broker)
+
+# ── requirements.txt ──────────────────────────────────────────────
+Django==5.1.0
+psycopg2-binary==2.9.10
+gunicorn==22.0.0
+locust==2.31.0
+django-redis==5.4.0
+redis==5.2.0
+celery==5.4.0
+django-celery-results==2.5.1
+requests==2.32.0

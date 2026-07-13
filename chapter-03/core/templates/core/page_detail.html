@@ -1,0 +1,59 @@
+{% extends "core/base.html" %}
+{% load beacon_wikilinks %}
+{% load cache %}
+
+{% block title %}{{ page.title }} — Beacon{% endblock %}
+
+{% block content %}
+    <div class="page-layout">
+        <main>
+            <article>
+                <h2 style="font-size:1.5rem;margin-bottom:var(--spacing-xs);">{{ page.title }}</h2>
+                <div class="meta" style="margin-bottom:var(--spacing-lg);">
+                    by {{ page.author.username }} —
+                    created {{ page.created_at|date:"M j, Y" }} —
+                    updated {{ page.updated_at|date:"M j, Y" }}
+                </div>
+
+                <div class="page-body">
+                    {{ page.body|render_wikilinks }}
+                </div>
+            </article>
+
+            <div class="actions">
+                <a href="{% url 'page_edit' slug=page.slug %}" class="btn">Edit</a>
+                <a href="{% url 'page_list' %}" class="btn btn-secondary">← All Pages</a>
+            </div>
+        </main>
+
+        <aside>
+            {# ── Chapter 3: Template fragment caching for the sidebar ── #}
+            {# The sidebar is expensive to render (iterating prefetched link   #}
+            {# objects) and shared across page views. We cache it for 300s.    #}
+            {# Each page gets its own cache entry because slug is a vary arg.  #}
+            {% cache 300 "sidebar" page.slug %}
+            {% if outgoing_pages %}
+                <div class="sidebar">
+                    <h3>Links To</h3>
+                    <ul>
+                        {% for target in outgoing_pages %}
+                            <li><a href="{{ target.get_absolute_url }}">{{ target.title }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            {% if incoming_links %}
+                <div class="sidebar" style="margin-top:var(--spacing-md);">
+                    <h3>Backlinks</h3>
+                    <ul>
+                        {% for source in incoming_links %}
+                            <li><a href="{{ source.get_absolute_url }}">{{ source.title }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            {% endcache %}
+        </aside>
+    </div>
+{% endblock %}

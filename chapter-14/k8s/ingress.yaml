@@ -1,0 +1,31 @@
+# Kubernetes Ingress — Beacon with TLS
+# Chapter 14: Observability When Things Go Dark
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: beacon-ingress
+  namespace: beacon-prod
+  labels:
+    app: beacon
+    chapter: "14"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - beacon.example.com
+      secretName: beacon-tls
+  rules:
+    - host: beacon.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: beacon-django
+                port:
+                  number: 80

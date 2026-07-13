@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Beacon{% endblock %}</title>
+    <style>
+        /* Chapter 1: minimal CSS. No build pipeline, no Tailwind, no SASS.
+           This is the simplest thing that works. Chapter 7 will add a
+           proper frontend when Beacon exposes a REST API. */
+
+        :root {
+            --color-bg: #fafafa;
+            --color-surface: #ffffff;
+            --color-text: #1a1a1a;
+            --color-muted: #6b6b6b;
+            --color-border: #e0e0e0;
+            --color-accent: #2563eb;
+            --color-accent-hover: #1d4ed8;
+            --color-danger: #dc2626;
+            --radius: 6px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                         "Helvetica Neue", Arial, sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--color-text);
+            background: var(--color-bg);
+        }
+
+        header {
+            background: var(--color-surface);
+            border-bottom: 1px solid var(--color-border);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        header h1 a {
+            color: var(--color-text);
+            text-decoration: none;
+        }
+
+        header nav a {
+            color: var(--color-muted);
+            text-decoration: none;
+            margin-left: 1rem;
+            font-size: 0.9rem;
+        }
+
+        header nav a:hover { color: var(--color-accent); }
+
+        main {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .search-bar input[type="search"] {
+            flex: 1;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius);
+            font-size: 0.95rem;
+        }
+
+        .search-bar button {
+            padding: 0.5rem 1rem;
+            background: var(--color-accent);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .search-bar button:hover { background: var(--color-accent-hover); }
+
+        .page-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius);
+            padding: 1rem 1.25rem;
+            margin-bottom: 0.75rem;
+            transition: box-shadow 0.15s;
+        }
+
+        .page-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+
+        .page-card h2 {
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .page-card h2 a {
+            color: var(--color-accent);
+            text-decoration: none;
+        }
+
+        .page-card h2 a:hover { text-decoration: underline; }
+
+        .page-card .meta {
+            font-size: 0.8rem;
+            color: var(--color-muted);
+        }
+
+        .page-body {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-top: 1rem;
+            white-space: pre-wrap;
+            line-height: 1.75;
+        }
+
+        .wikilink {
+            color: var(--color-accent);
+            text-decoration: none;
+            border-bottom: 1px dashed var(--color-accent);
+        }
+
+        .wikilink:hover { border-bottom-style: solid; }
+
+        .sidebar {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius);
+            padding: 1rem 1.25rem;
+            margin-top: 1.5rem;
+        }
+
+        .sidebar h3 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--color-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li { margin-bottom: 0.35rem; }
+
+        .sidebar ul li a {
+            color: var(--color-accent);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .sidebar ul li a:hover { text-decoration: underline; }
+
+        .sidebar ul li .meta {
+            font-size: 0.75rem;
+            color: var(--color-muted);
+        }
+
+        .form-group { margin-bottom: 1rem; }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius);
+            font-size: 0.95rem;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            min-height: 300px;
+            resize: vertical;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.5rem 1.25rem;
+            background: var(--color-accent);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 0.95rem;
+            text-decoration: none;
+        }
+
+        .btn:hover { background: var(--color-accent-hover); }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--color-accent);
+            border: 1px solid var(--color-accent);
+        }
+
+        .btn-secondary:hover { background: var(--color-accent); color: white; }
+
+        .btn-danger {
+            background: var(--color-danger);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .pagination a, .pagination span {
+            padding: 0.35rem 0.75rem;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius);
+            text-decoration: none;
+            color: var(--color-text);
+            font-size: 0.9rem;
+        }
+
+        .pagination .current {
+            background: var(--color-accent);
+            color: white;
+            border-color: var(--color-accent);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--color-muted);
+        }
+
+        .empty-state p { margin-bottom: 1rem; }
+
+        .breadcrumbs {
+            font-size: 0.85rem;
+            color: var(--color-muted);
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumbs a { color: var(--color-muted); text-decoration: none; }
+        .breadcrumbs a:hover { color: var(--color-accent); }
+
+        .actions { margin-top: 1.5rem; display: flex; gap: 0.75rem; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1><a href="{% url 'page_list' %}">🔦 Beacon</a></h1>
+        <nav>
+            <a href="{% url 'page_edit' slug='new' %}">+ New Page</a>
+            {% if user.is_authenticated %}
+                <span style="font-size:0.85rem;color:var(--color-muted);">
+                    {{ user.username }}
+                </span>
+            {% endif %}
+        </nav>
+    </header>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>
